@@ -1,0 +1,82 @@
+请求会话列表接口:
+请求第一个接口会拆分生成两张表: 会话列表已经完成的、会话列表未完成
+`t_all_session_has_finish` | `t_all_session_not_finish`(
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `opt_type`   '操作类型',
+  `corp_id`   '企业id',
+  `sessionid`   '会话id',
+  `user_id`   '用户id',
+  `username`   '用户名称',
+  `lables`   '用户标签',
+  `channel_name`   '渠道名称',
+  `channel_appid`   '渠道id',
+  `first_queue_time`   '首次排队时间',
+  `queue_size`   '排队数',
+  `first_agent_time`   '首次进人工时间',
+  `first_agent_id`   '首次接入人工id',
+  `first_agent_name`   '首次接入坐席名称',
+  `first_agent_group`   '首次接入坐席组名称',
+  `first_response_time`   '首次响应时间',
+  `is_transfer`   '是否转接',
+  `last_transfer_time`   '最后一次转接时间',
+  `transfer_recv_id`   '转接接收坐席id',
+  `transfer_recv_name`   '转接坐席名称',
+  `transfer_recv_group`   '转接坐席所在组',
+  `is_group_talk`   '是否群聊 0否 1是',
+  `group_talk_id`   '群聊id',
+  `quitsession_time`   '退出群聊时间',
+  `finish_time`   '归档时间',
+  `satisfaction`   '满意度 1-5分别为非常不满意、不满意、一般、满意、非常满意，0未评价',
+  `problem_type_name`   '归档路径',
+  `finish_remark`   '归档备注',
+  `finish_agent_id`   '归档人工id',
+  `finish_agent_name`   '归档人工名称',
+) '所有会话列表-已完成'
+
+
+first_queue_time 是用户角度的开始时间
+first_agent_time 是客服的开始时间
+finish_time 是结束时间
+
+但是 t_all_session_not_finish 表 不一定每一条数据都有 first_agent_time , 以及一定没有结束时间(finish_time)
+
+请求第三个接口会生成会话详细表, 关联关系为sessionid字段
+`t_history_session_detail` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `msg_id`  '消息id',
+  `msg_time`  '发送消息时间',
+  `group_id`  '组织ID',
+  `from_type`  '来源，消息发送方',
+  `msg_type`  '消息类型 voice text image queue finish',
+  `from` varchar(100) DEFAULT NULL,
+  `sender` varchar(100) DEFAULT NULL,
+  `to`  '消息接收方',
+  `content` text COMMENT '消息内容',
+  `kf_pic_url`  '图片内容',
+  `kf_voice_url`  '语音内容',
+  `kf_video_url`  '视频内容',
+  `kf_file_url`  '文件',
+  `media_id`  '微信素材id，微信渠道使用',
+  `event`  '事件类型',
+  `mentioned_type` varchar(100) DEFAULT NULL,
+  `username` varchar(100) DEFAULT NULL,
+  `sessionid`  '会话id',
+  PRIMARY KEY (`id`)
+) '历史会话详情'
+
+msg_time 是数据记录的时间点
+
+如果 from_type 为 'user':
+	from 为用户微信openid
+反之如果 from_type 为 'agent':
+	from 为客服id
+反之如果 from_type 为 NULL:
+	from 为 'sys' 代表着系统发送
+
+msg_type 可选项为: voice text image queue finish 
+如果 msg_type 为 'text' :
+	content 为消息文字内容
+反之如果 msg_type 为 'finish' :
+	则意味着这条消息标志着这次会话结束了
+
+
