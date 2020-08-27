@@ -1,4 +1,4 @@
-# 更多文档请前往[docs](https://github.com/laashub-sda/laas-sda/blob/master/docs)目录查看
+# 更多文档请前往[docs](https://github.com/laashub-of-scg/scg/blob/master/docs)目录查看
 
 # 集群网关
 
